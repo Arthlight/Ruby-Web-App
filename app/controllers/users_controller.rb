@@ -13,6 +13,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find params[:id]
+    @microposts = @user.microposts.paginate(page: params[:page])
     unless @user.activated?
       flash[:info] = "Please check your email to activate your account"
       redirect_to root_url
@@ -31,6 +32,7 @@ class UsersController < ApplicationController
   end
 
   def edit
+    # already defined @user due to the before action.
   end
 
   def update
