@@ -88,12 +88,34 @@ class UserTest < ActiveSupport::TestCase
     assert_not arthur.following?(archer)
     arthur.follow(archer)
     assert arthur.following?(archer)
-    assert archer.followers.include?(michael)
+    assert archer.followers.include?(arthur)
     arthur.unfollow(archer)
     assert_not arthur.following?(archer)
     # Users can't follow themselves.
     arthur.follow(arthur)
-    assert_not arthur.following?(michael)
+    assert_not arthur.following?(arthur)
+  end
+
+  test "feed should have the right posts" do
+    arthur = users(:arthur)
+    archer  = users(:archer)
+    lana    = users(:lana)
+    # Posts from followed user
+    lana.microposts.each do |post_following|
+      assert arthur.feed.include?(post_following)
+    end
+    # Self-posts for user with followers
+    arthur.microposts.each do |post_self|
+      assert arthur.feed.include?(post_self)
+    end
+    # Self-posts for user with no followers
+    archer.microposts.each do |post_self|
+      assert archer.feed.include?(post_self)
+    end
+    # Posts from unfollowed user
+    archer.microposts.each do |post_unfollowed|
+      assert_not arthur.feed.include?(post_unfollowed)
+    end
   end
 
 end
